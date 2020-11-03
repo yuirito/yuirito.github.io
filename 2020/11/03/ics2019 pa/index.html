@@ -7,17 +7,19 @@
   
   <title>ics2019 pa | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一级标题PA1​        PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下    命令 格式 使用举例 说明    帮助(1) help help 打印命令的帮助信息   继续运行(1) c c 继续运行被暂停的程序   退出(1) q q 退出NEMU   单步执行 si [N] si 10 让程序单步执行N条指令后暂停执行, 当N没有给出时">
+  <meta name="description" content="PA1​        PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下    命令 格式 使用举例 说明    帮助(1) help help 打印命令的帮助信息   继续运行(1) c c 继续运行被暂停的程序   退出(1) q q 退出NEMU   单步执行 si [N] si 10 让程序单步执行N条指令后暂停执行, 当N没有给出时, 缺省">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ics2019 pa">
 <meta property="og:url" content="http://example.com/2020/11/03/ics2019%20pa/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="一级标题PA1​        PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下    命令 格式 使用举例 说明    帮助(1) help help 打印命令的帮助信息   继续运行(1) c c 继续运行被暂停的程序   退出(1) q q 退出NEMU   单步执行 si [N] si 10 让程序单步执行N条指令后暂停执行, 当N没有给出时">
+<meta property="og:description" content="PA1​        PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下    命令 格式 使用举例 说明    帮助(1) help help 打印命令的帮助信息   继续运行(1) c c 继续运行被暂停的程序   退出(1) q q 退出NEMU   单步执行 si [N] si 10 让程序单步执行N条指令后暂停执行, 当N没有给出时, 缺省">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2020/11/03/ics2019%20pa/pa1.jpg">
 <meta property="article:published_time" content="2020-11-03T05:21:06.000Z">
-<meta property="article:modified_time" content="2020-11-03T07:46:36.057Z">
+<meta property="article:modified_time" content="2020-11-03T07:50:46.297Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2020/11/03/ics2019%20pa/pa1.jpg">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -88,7 +90,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="一级标题"><a href="#一级标题" class="headerlink" title="一级标题"></a>一级标题</h1><h1 id="PA1"><a href="#PA1" class="headerlink" title="PA1"></a>PA1</h1><p>​        PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下</p>
+        <h1 id="PA1"><a href="#PA1" class="headerlink" title="PA1"></a>PA1</h1><p>​        PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下</p>
 <table>
 <thead>
 <tr>
@@ -161,7 +163,7 @@
 </li>
 </ul>
 <p>  之后再具体说明上述命令如何实现，先看下PA1需要修改的文件，见下图</p>
-<p>  ![](.\ics2019 pa\pa1.jpg)</p>
+<p>  <img src="/2020/11/03/ics2019%20pa/pa1.jpg"></p>
 <p>  ​        其中ui.c是主要的交互界面代码，进入主循环后，用户输入的命令在这个文件里面进行解析，再分类处理，PA1.1也是从这里开始，主要增加一些命令，后面PA1.1再详述，包括对reg.c文件的修改。</p>
 <p>  ​        expr.c是表达式处理，主要是辅助完成p 命令，以及后面的监视点，个人认为是PA1里面最重要的部分，是PA1.2的核心内容，为了测试表达式处理是否正确，gen-expr.c是自己设计随机生成一些表达式进行检测，与主程序无关，仅仅测试使用。</p>
 <p>  ​        watchpoint.h, watchpoint.c是辅助实现w和d命令，也就是建立监视点和删除监视点，另外cpu-exec.c中需要增加几行代码，实现对监视点的监视。后面PA1.3再详述。</p>
