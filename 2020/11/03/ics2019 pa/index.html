@@ -7,16 +7,16 @@
   
   <title>ics2019 pa | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="PA1​        PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下    命令 格式 使用举例 说明    帮助(1) help help 打印命令的帮助信息   继续运行(1) c c 继续运行被暂停的程序   退出(1) q q 退出NEMU   单步执行 si [N] si 10 让程序单步执行N条指令后暂停执行, 当N没有给出时, 缺省">
+  <meta name="description" content="PA1PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下    命令 格式 使用举例 说明    帮助(1) help help 打印命令的帮助信息   继续运行(1) c c 继续运行被暂停的程序   退出(1) q q 退出NEMU   单步执行 si [N] si 10 让程序单步执行N条指令后暂停执行, 当N没有给出时, 缺省为1   打印程序">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ics2019 pa">
 <meta property="og:url" content="http://example.com/2020/11/03/ics2019%20pa/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="PA1​        PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下    命令 格式 使用举例 说明    帮助(1) help help 打印命令的帮助信息   继续运行(1) c c 继续运行被暂停的程序   退出(1) q q 退出NEMU   单步执行 si [N] si 10 让程序单步执行N条指令后暂停执行, 当N没有给出时, 缺省">
+<meta property="og:description" content="PA1PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下    命令 格式 使用举例 说明    帮助(1) help help 打印命令的帮助信息   继续运行(1) c c 继续运行被暂停的程序   退出(1) q q 退出NEMU   单步执行 si [N] si 10 让程序单步执行N条指令后暂停执行, 当N没有给出时, 缺省为1   打印程序">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/2020/11/03/ics2019%20pa/pa1.jpg">
 <meta property="article:published_time" content="2020-11-03T05:21:06.000Z">
-<meta property="article:modified_time" content="2020-11-10T18:04:59.776Z">
+<meta property="article:modified_time" content="2020-11-11T08:01:57.602Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2020/11/03/ics2019%20pa/pa1.jpg">
@@ -90,7 +90,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="PA1"><a href="#PA1" class="headerlink" title="PA1"></a>PA1</h1><p>​        PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下</p>
+        <h1 id="PA1"><a href="#PA1" class="headerlink" title="PA1"></a>PA1</h1><p>PA1的内容分为3个部分，不过核心是实现手册里面的基础设施中的调试器的一些功能，具体功能列表如下</p>
 <table>
 <thead>
 <tr>
@@ -162,23 +162,23 @@
 <li><p>(2) 与GDB相比, 我们在这里做了简化, 更改了命令的格式</p>
 </li>
 </ul>
-<p>  之后再具体说明上述命令如何实现，先看下PA1需要修改的文件，见下图</p>
-<p>  <img src="/2020/11/03/ics2019%20pa/pa1.jpg"></p>
-<p>  ​        其中ui.c是主要的交互界面代码，进入主循环后，用户输入的命令在这个文件里面进行解析，再分类处理，PA1.1也是从这里开始，主要增加一些命令，后面PA1.1再详述，包括对reg.c文件的修改。</p>
-<p>  ​        expr.c是表达式处理，主要是辅助完成p 命令，以及后面的监视点，个人认为是PA1里面最重要的部分，是PA1.2的核心内容，为了测试表达式处理是否正确，gen-expr.c是自己设计随机生成一些表达式进行检测，与主程序无关，仅仅测试使用。</p>
-<p>  ​        watchpoint.h, watchpoint.c是辅助实现w和d命令，也就是建立监视点和删除监视点，另外cpu-exec.c中需要增加几行代码，实现对监视点的监视。后面PA1.3再详述。</p>
-<h2 id="PA1-0"><a href="#PA1-0" class="headerlink" title="PA1.0"></a>PA1.0</h2><p>​        在正式开始PA1之前，如果你选择的是x86的ISA，还有一些准备工作需要做，如果不是x86，可以直接跳过此节。</p>
-<p>​        打开nemu/src/isa/x86/include/isa/reg.h文件，可以看到对CPU_state定义的结构体如下</p>
+<p>之后再具体说明上述命令如何实现，先看下PA1需要修改的文件，见下图</p>
+<p><img src="/2020/11/03/ics2019%20pa/pa1.jpg"></p>
+<p>其中ui.c是主要的交互界面代码，进入主循环后，用户输入的命令在这个文件里面进行解析，再分类处理，PA1.1也是从这里开始，主要增加一些命令，后面PA1.1再详述，包括对reg.c文件的修改。</p>
+<p>expr.c是表达式处理，主要是辅助完成p 命令，以及后面的监视点，个人认为是PA1里面最重要的部分，是PA1.2的核心内容，为了测试表达式处理是否正确，gen-expr.c是自己设计随机生成一些表达式进行检测，与主程序无关，仅仅测试使用。</p>
+<p>watchpoint.h, watchpoint.c是辅助实现w和d命令，也就是建立监视点和删除监视点，另外cpu-exec.c中需要增加几行代码，实现对监视点的监视。后面PA1.3再详述。</p>
+<h2 id="PA1-0"><a href="#PA1-0" class="headerlink" title="PA1.0"></a>PA1.0</h2><p>在正式开始PA1之前，如果你选择的是x86的ISA，还有一些准备工作需要做，如果不是x86，可以直接跳过此节。</p>
+<p>打开nemu/src/isa/x86/include/isa/reg.h文件，可以看到对CPU_state定义的结构体如下</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">typedef struct&#123;</span><br><span class="line">struct&#123;</span><br><span class="line"> uint32_t _32;</span><br><span class="line"> uint16_t _16;</span><br><span class="line"> uint8_t _8[2];</span><br><span class="line"> &#125;gpr[8];</span><br><span class="line">rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;</span><br><span class="line">vaddr_t pc;</span><br><span class="line">&#125;CPU_state;</span><br></pre></td></tr></table></figure>
 
-<p>​        因为原先定义的是struct，gpr数组和8个寄存器并没有关联，物理上是顺序独立的排列，为了让他们相关联起来，就要使用union，改后的代码如下</p>
+<p>因为原先定义的是struct，gpr数组和8个寄存器并没有关联，物理上是顺序独立的排列，为了让他们相关联起来，就要使用union，改后的代码如下</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">typedef struct &#123;</span><br><span class="line">    union&#123;</span><br><span class="line">        union&#123;</span><br><span class="line">            uint32_t _32;</span><br><span class="line">            uint16_t _16;</span><br><span class="line">            uint8_t _8[2];</span><br><span class="line">        &#125; gpr[8];</span><br><span class="line">        struct&#123;</span><br><span class="line">            rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;;</span><br><span class="line">  vaddr_t pc;</span><br><span class="line"></span><br><span class="line">&#125; CPU_state;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p>​        可以观察reg.c中的reg_test()是如何进行测试的，生成一个随机数，然后赋值给每个32位的寄存器，然后对关联性检查。</p>
-<p>​        修改完代码以后，在menu目录下执行make run，如果看到欢迎提示，进入(menu)等待输入命令就说明成功了。</p>
-<h2 id="PA1-1"><a href="#PA1-1" class="headerlink" title="PA1.1"></a>PA1.1</h2><p>​        PA1.1要实现si, x, info r三条命令。</p>
-<p>​        要增加一条新的命令先写一个对应的函数，然后在cmd_table中增加命令的名称，说明，函数即可</p>
-<p>​        cmd_table的结构定义如下</p>
+<p>可以观察reg.c中的reg_test()是如何进行测试的，生成一个随机数，然后赋值给每个32位的寄存器，然后对关联性检查。</p>
+<p>修改完代码以后，在menu目录下执行make run，如果看到欢迎提示，进入(menu)等待输入命令就说明成功了。</p>
+<h2 id="PA1-1"><a href="#PA1-1" class="headerlink" title="PA1.1"></a>PA1.1</h2><p>PA1.1要实现si, x, info r三条命令。</p>
+<p>要增加一条新的命令先写一个对应的函数，然后在cmd_table中增加命令的名称，说明，函数即可</p>
+<p>cmd_table的结构定义如下</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">static struct &#123;</span><br><span class="line">  char *name;</span><br><span class="line">  char *description;</span><br><span class="line">  int (*handler) (char *);</span><br><span class="line">&#125; cmd_table []</span><br></pre></td></tr></table></figure>
 
 
@@ -186,7 +186,7 @@
 <h4 id="si命令"><a href="#si命令" class="headerlink" title="si命令"></a>si命令</h4><p>我先上我写的cmd_si()，再具体说明</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">static int cmd_si(char *args) &#123;</span><br><span class="line">    &#x2F;* extract the first argument *&#x2F;</span><br><span class="line">    char *arg &#x3D; strtok(NULL, &quot; &quot;);</span><br><span class="line">    if (arg &#x3D;&#x3D; NULL) &#123;</span><br><span class="line">        &#x2F;* no argument given *&#x2F;</span><br><span class="line">        cpu_exec(1);</span><br><span class="line">    &#125;</span><br><span class="line">    else &#123;</span><br><span class="line">        int n &#x3D; atoi(arg);</span><br><span class="line">        if(n&gt;0)</span><br><span class="line">            cpu_exec(n);</span><br><span class="line">        else</span><br><span class="line">            cmd_err(0, &quot;si:N&lt;&#x3D;0&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>​        cmd_si是我觉得这几个命令里面相对来说最简单的一个，因为他只要读出命令中的N，转化为数字再传给cpu_exec()即可，cpu_exec(n)是执行程序，其参数n是执行n步，在这里先用strtok函数读入命令格式中的N，如果没有的话就默认执行1步，即cpu_exec(1)，否则的话用atoi转化为数字后再调用。另外这里cmd_err是一个通用的报错函数，定义如下</p>
+<p>cmd_si是我觉得这几个命令里面相对来说最简单的一个，因为他只要读出命令中的N，转化为数字再传给cpu_exec()即可，cpu_exec(n)是执行程序，其参数n是执行n步，在这里先用strtok函数读入命令格式中的N，如果没有的话就默认执行1步，即cpu_exec(1)，否则的话用atoi转化为数字后再调用。另外这里cmd_err是一个通用的报错函数，定义如下</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">static void cmd_err(int err_type,const char *command)&#123;</span><br><span class="line">    switch(err_type)&#123;</span><br><span class="line">        case 0:</span><br><span class="line">            printf(&quot;Invalid arguments for command &#39;%s&#39;\n&quot;,command);</span><br><span class="line">            break;</span><br><span class="line">        case 1:</span><br><span class="line">            printf(&quot;Lack arguments for command &#39;%s&#39;\n&quot;,command);</span><br><span class="line">            break;</span><br><span class="line">        default:</span><br><span class="line">            printf(&quot;Unknown error\n&quot;);</span><br><span class="line">            break;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="x命令"><a href="#x命令" class="headerlink" title="x命令"></a>x命令</h4><p>​        x命令需要用到vaddr_read(addr,n)函数，其中参数addr是内存地址，n是读出的字节数，思路和刚刚一样，先用strtok函数读出命令的2个参数N和exp，这里暂时不考虑复杂的表达式，仅限于16进制数字，所以可以直接使用sscanf(arg2,”%x”,&amp;addr);将第2个参数地址得到，然后再用vaddr_read(addr,4)每次读出4个字节的内存，循环N次即可。</p>
