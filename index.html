@@ -234,7 +234,7 @@
 <td>表达式求值</td>
 <td align="left"><code>p EXPR</code></td>
 <td align="left"><code>p $eax + 1</code></td>
-<td>求出表达式<code>EXPR</code>的值, <code>EXPR</code>支持的 运算请见<a target="_blank" rel="noopener" href="https://nju-projectn.github.io/ics-pa-gitbook/ics2019/1.6.html">调试中的表达式求值</a>小节</td>
+<td>求出表达式<code>EXPR</code>的值, <code>EXPR</code>支持的 运算请见<a href="https://nju-projectn.github.io/ics-pa-gitbook/ics2019/1.6.html">调试中的表达式求值</a>小节</td>
 </tr>
 <tr>
 <td>扫描内存(2)</td>
@@ -417,7 +417,19 @@
 
 <p>对tokens数组扫描，对于其中的*也就是type是TK_MUL，如果位置在第一个，或者他的前一个符号不是数字(可以用优先级简单的判断，因为数字的优先级是0)，且不是右括号，那么将这个TK_MUL重新解释为TK_DEREF，优先级为6。同理对TK_NEGTIVE也进行类似的判断识别。现在所有符号都正确的识别了，可以使用eval对其进行求值了。</p>
 <p>uint32_t eval(int p, int q, bool *success)，求出tokens数组从p到q所代表的表达式的值，如果求值成功*success==true，失败*success==false，返回求值的结果。eval的大致框架和思路在手册里面有写，这里就不赘述了。eval流程图如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">A(开始) --&gt; B&#123;p与q的关系&#125;</span><br><span class="line">    B --&gt; |p &gt; q| err[*success&#x3D;false&lt;br &#x2F;&gt;return -1]</span><br><span class="line">    B --&gt; |p &#x3D;&#x3D; q| E[&quot;根据tokens[p].type&lt;br &#x2F;&gt;(10进制,16进制或寄存器)求值&quot;]</span><br><span class="line">    B --&gt; |p &lt; q| F[&quot;ret&#x3D;check_parenthese(p,q)&quot;]</span><br><span class="line">    F --&gt; G&#123;ret返回值&#125;</span><br><span class="line">    G --&gt; |ret &#x3D;&#x3D; -1| err</span><br><span class="line">    G --&gt; |ret &#x3D;&#x3D; 1| ret1[&quot;return eval(p+1,q-1,success)&quot;]</span><br><span class="line">    G --&gt; |ret &#x3D;&#x3D; 0| ret0[&quot;pos&#x3D;get_main_op(p,q)&quot;]</span><br><span class="line">    ret0 --&gt; |pos &#x3D;&#x3D; -1| err</span><br><span class="line">    ret0 --&gt; |pos !&#x3D; -1| eval[&quot;val1 &#x3D; eval(p, pos - 1, success);&lt;br &#x2F;&gt;</span><br><span class="line">    val2 &#x3D; eval(pos + 1, q, success);&lt;br &#x2F;&gt;</span><br><span class="line">    根据tokens[pos].type进行运算&quot;]</span><br></pre></td></tr></table></figure>
+<pre class="mermaid">graph TD
+A(开始) --> B{p与q的关系}
+    B --> |p > q| err[*success=false<br>return -1]
+    B --> |p == q| E["根据tokens[p].type<br>(10进制,16进制或寄存器)求值"]
+    B --> |p < q| F["ret=check_parenthese(p,q)"]
+    F --> G{ret返回值}
+    G --> |ret == -1| err
+    G --> |ret == 1| ret1["return eval(p+1,q-1,success)"]
+    G --> |ret == 0| ret0["pos=get_main_op(p,q)"]
+    ret0 --> |pos == -1| err
+    ret0 --> |pos != -1| eval["val1 = eval(p, pos - 1, success);<br>
+    val2 = eval(pos + 1, q, success);<br>
+    根据tokens[pos].type进行运算"]</pre>
 
 <p>有了流程图，大致的代码思路应该已经有了，再来说下其中的细节。</p>
 <p>首先是p==q的时候，这时候说明这个表达式没有运算符号，其本身是一个数值或者寄存器，如果是TK_NUM或者TK_HEX，那么直接strtoul(tokens[p].str, NULL, 0)就可以把字符串转化为数值，如果是TK_REG，那么需要使用isa_reg_str2val(tokens[p].str + 1, success)获取寄存器的值。这个isa_reg_str2val()函数在之前的reg.c中，需要你去实现它。</p>
@@ -515,19 +527,19 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+          <p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
 <h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
 <h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
 <h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
 <h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 
       
     </div>
@@ -645,6 +657,14 @@
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
   </div>
+
+
+  <script src='https://unpkg.com/mermaid@/dist/mermaid.min.js'></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({theme: 'forest'});
+    }
+  </script>
 
         
 
