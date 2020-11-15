@@ -29,7 +29,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/2020/11/03/ics2019%20pa/pa1.jpg">
 <meta property="article:published_time" content="2020-11-03T05:21:06.000Z">
-<meta property="article:modified_time" content="2020-11-14T15:34:43.073Z">
+<meta property="article:modified_time" content="2020-11-15T11:57:36.137Z">
 <meta property="article:author" content="yuirito">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2020/11/03/ics2019%20pa/pa1.jpg">
@@ -182,7 +182,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-11-14 23:34:43" itemprop="dateModified" datetime="2020-11-14T23:34:43+08:00">2020-11-14</time>
+                <time title="Modified: 2020-11-15 19:57:36" itemprop="dateModified" datetime="2020-11-15T19:57:36+08:00">2020-11-15</time>
               </span>
 
           
@@ -603,8 +603,32 @@ A(开始) --> B{p与q的关系}
 <figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">addr</span> = R[ECX] + R[EBX] * <span class="number">4</span> - <span class="number">0</span>x<span class="number">2000</span></span><br></pre></td></tr></table></figure>
 
 <p>而从代码里面我们可以看到是用了一系列的rtl完成上面这个表达式的计算，用了2个临时寄存器s0和s1保存中间计算结果，具体看代码应该看得懂。总之计算完地址后可以把目的操作数类型填写为OP_TYPE_MEM，并将地址保存在其addr成员中。译码阶段算是完成了，执行阶段与前面mov指令类型就不再赘述了，我们直接开始完成PA2.1。</p>
-<p>按照手册的提示，要运行第一个程序需要完成<code>call</code>, <code>push</code>, <code>sub</code>, <code>xor</code>, <code>ret</code>五条指令。更具体的来说，我们需要完成nexus-am/tests/cputest/build/dummy-$ISA-nemu.txt中的这5条指令。</p>
-<h3 id="call指令"><a href="#call指令" class="headerlink" title="call指令"></a>call指令</h3>
+<p>按照手册的提示，要运行第一个程序需要完成<code>call</code>, <code>push</code>, <code>sub</code>, <code>xor</code>, <code>ret</code>五条指令。更具体的来说，我们需要完成nexus-am/tests/cputest/build/dummy-$ISA-nemu.txt中的这5条指令。（建议配合i386手册食用)</p>
+<h3 id="call指令"><a href="#call指令" class="headerlink" title="call指令"></a>call指令</h3><p>查看反汇编结果，可以看到这里有2条call指令，且它们的形式相同，都是e8 cd的形式，我们以第一条为例。</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">10000</span>a:	e8 <span class="number">05</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>       	call   <span class="number">100014</span> &lt;_trm_init&gt;</span><br></pre></td></tr></table></figure>
+
+<p>e8是opcode，后面4个字节是偏移量，跳转的地址是pc+指令长度+偏移量，也就是</p>
+<p>0x10000a + 0x5 + 0x5 = 0x100014</p>
+<p>我们首先要去填写opcode_table[0xe8]，指示它的译码函数和执行函数，这个需要提前查看所有的译码函数选择恰当的一个，这里选择decode_J(),执行函数也是类似，选择exec_call()，位宽是4个字节，因此</p>
+<p>opcode_table[0xe8]=IDEX(J, call)</p>
+<p>接下来看译码函数，先明确译码函数的任务应该是再取4个字节作为偏移量，计算出跳转地址并保存在decoinfo中。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">make<span class="constructor">_DHelper(J)</span> &#123;</span><br><span class="line">  decode<span class="constructor">_op_SI(<span class="params">pc</span>, <span class="params">id_dest</span>, <span class="params">false</span>)</span>;</span><br><span class="line">  <span class="comment">// the target address can be computed in the decode stage</span></span><br><span class="line">  decinfo.jmp_pc = id_dest-&gt;simm + *pc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个辅助函数是写好的，不用我们补充，但是decode_op_SI()函数需要我们自己填写，而且其实主要的工作还是这个函数完成，取width宽度的字节作为偏移量，然后如果width小于4的话，还要进一步进行符号位扩展，最后保存在op-&gt;simm中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* I386 manual does not contain this abbreviation, but it is different from</span></span><br><span class="line"><span class="comment"> * the one above from the view of implementation. So we use another helper</span></span><br><span class="line"><span class="comment"> * function to decode it.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">/* sign immediate */</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="title">make_DopHelper</span><span class="params">(SI)</span> </span>&#123;</span><br><span class="line">  assert(op-&gt;width == <span class="number">1</span> || op-&gt;width == <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">  op-&gt;type = OP_TYPE_IMM;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* <span class="doctag">TODO:</span> Use instr_fetch() to read `op-&gt;width&#x27; bytes of memory</span></span><br><span class="line"><span class="comment">   * pointed by &#x27;pc&#x27;. Interpret the result as a signed immediate,</span></span><br><span class="line"><span class="comment">   * and assign it to op-&gt;simm.</span></span><br><span class="line"><span class="comment">   *</span></span><br><span class="line"><span class="comment">   op-&gt;simm = ???</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="comment">/* PA2.1 */</span></span><br><span class="line">  s0 = instr_fetch(pc, op-&gt;width);</span><br><span class="line">  rtl_sext(&amp;s0, &amp;s0, op -&gt; width);</span><br><span class="line">  op -&gt; simm = s0;</span><br><span class="line"></span><br><span class="line">  rtl_li(&amp;op-&gt;val, op-&gt;simm);</span><br><span class="line"></span><br><span class="line">  print_Dop(op-&gt;str, OP_STR_SIZE, <span class="string">&quot;$0x%x&quot;</span>, op-&gt;simm);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里使用rtl_sext进行符号位扩展，不过rtl_sext()也需要自己补充：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">rtl_sext</span><span class="params">(<span class="keyword">rtlreg_t</span>* dest, <span class="keyword">const</span> <span class="keyword">rtlreg_t</span>* src1, <span class="keyword">int</span> width)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// dest &lt;- signext(src1[(width * 8 - 1) .. 0])</span></span><br><span class="line">  <span class="keyword">int32_t</span> val = *src1;</span><br><span class="line">  *dest = (val &lt;&lt; (<span class="number">32</span> - width * <span class="number">8</span>)) &gt;&gt; (<span class="number">32</span> - width * <span class="number">8</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>译码函数算是写完了，再来看执行函数，还是先明确call执行函数的任务：先把下一条指令的地址(seq_pc)压栈，然后跳转到译码函数计算出来的地址(jmp_pc)。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">make_EHelper(call) &#123;</span><br><span class="line">  <span class="comment">// the target address is calculated at the decode stage</span></span><br><span class="line">  <span class="comment">/* PA2.1 */</span></span><br><span class="line">  rtl_push(&amp;decinfo.seq_pc);</span><br><span class="line">  rtl_j(decinfo.jmp_pc);</span><br><span class="line"></span><br><span class="line">  print_asm(<span class="string">&quot;call %x&quot;</span>, decinfo.jmp_pc);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>rtl_j()已经给出，我们需要实现rtl_push()：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">rtl_push</span><span class="params">(<span class="keyword">const</span> <span class="keyword">rtlreg_t</span>* src1)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// esp &lt;- esp - 4</span></span><br><span class="line">  <span class="comment">// M[esp] &lt;- src1</span></span><br><span class="line">  <span class="comment">/* PA2.1 */</span></span><br><span class="line">  reg_l(R_ESP) -= <span class="number">4</span>;</span><br><span class="line">  rtl_sm(&amp;reg_l(R_ESP), src1, <span class="number">4</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用rtl_sm作为客户访存，把地址压栈。</p>
+<p>整个call指令就算完成了，感觉还是蛮简单的，理解了过程以后真的做起来就感觉不难了。</p>
+
     </div>
 
     
