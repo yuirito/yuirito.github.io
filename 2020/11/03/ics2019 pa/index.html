@@ -29,7 +29,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/2020/11/03/ics2019%20pa/pa1.jpg">
 <meta property="article:published_time" content="2020-11-03T05:21:06.000Z">
-<meta property="article:modified_time" content="2020-11-16T12:28:02.287Z">
+<meta property="article:modified_time" content="2020-11-20T08:38:51.077Z">
 <meta property="article:author" content="yuirito">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2020/11/03/ics2019%20pa/pa1.jpg">
@@ -182,7 +182,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-11-16 20:28:02" itemprop="dateModified" datetime="2020-11-16T20:28:02+08:00">2020-11-16</time>
+                <time title="Modified: 2020-11-20 16:38:51" itemprop="dateModified" datetime="2020-11-20T16:38:51+08:00">2020-11-20</time>
               </span>
 
           
@@ -649,7 +649,7 @@ A(开始) --> B{p与q的关系}
 
 <p>rtl_push已经实现过了，这样push指令也算完成了。</p>
 <p>还有一条push的opcode是0x55，不要忘了。</p>
-<p>xor指令的opcode是0x31</p>
+<h3 id="xor指令"><a href="#xor指令" class="headerlink" title="xor指令"></a>xor指令</h3><p>xor指令的opcode是0x31</p>
 <figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">100010</span>:	<span class="number">31</span> <span class="keyword">c</span><span class="number">0</span>                	<span class="keyword">xor</span>    <span class="symbol">%eax</span>,<span class="symbol">%eax</span></span><br></pre></td></tr></table></figure>
 
 <p>opcode_table[0x31]=IDEX(G2E, xor)</p>
@@ -701,6 +701,18 @@ A(开始) --> B{p与q的关系}
 
 <p>最后不要忘记在all-instr.h里面加上你声明的函数。</p>
 <p>PA2.1到此为止</p>
+<h2 id="PA2-2"><a href="#PA2-2" class="headerlink" title="PA2.2"></a>PA2.2</h2><p>一上来先把tests里面的测试用例都要做了，这真没办法，一个个的实现，从add.c开始，这里我不可能再分步细说如何去做，步骤和PA2.1其实都一样，个别特殊的指令我会提一下，其他的（其实全部）都可以去看代码读明白。</p>
+<h3 id="sete指令"><a href="#sete指令" class="headerlink" title="sete指令"></a>sete指令</h3><p>这是一条双字节opcode的指令，指令的格式如下</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0</span>F  <span class="number">94</span>   SETE r/m8    <span class="number">4</span>/<span class="number">5</span>     Set byte <span class="keyword">if</span> equal (ZF=<span class="number">1</span>)</span><br><span class="line"><span class="comment">//IF condition THEN r/m8 := 1 ELSE r/m8 := 0; FI;</span></span><br></pre></td></tr></table></figure>
+
+<p>opcode_table[0x0f]=EX(2byte_esc)</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="title">make_EHelper</span><span class="params">(<span class="number">2b</span>yte_esc)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">uint32_t</span> opcode = instr_fetch(pc, <span class="number">1</span>) | <span class="number">0x100</span>;</span><br><span class="line">  decinfo.opcode = opcode;</span><br><span class="line">  set_width(opcode_table[opcode].width);</span><br><span class="line">  idex(pc, &amp;opcode_table[opcode]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可见，需要再读入一个字节，然后以0x100+读入的字节作为索引重新搜索opcode_table。</p>
+<p>另外根据第2个字节的低4位确定condition：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> invert = subcode &amp; <span class="number">0x1</span>;</span><br><span class="line">  <span class="keyword">enum</span> &#123;</span><br><span class="line">    CC_O, CC_NO, CC_B,  CC_NB,</span><br><span class="line">    CC_E, CC_NE, CC_BE, CC_NBE,</span><br><span class="line">    CC_S, CC_NS, CC_P,  CC_NP,</span><br><span class="line">    CC_L, CC_NL, CC_LE, CC_NLE</span><br><span class="line">  &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>需要完成cc.c文件里面的rtl_setcc()。</p>
 
     </div>
 
@@ -778,7 +790,7 @@ A(开始) --> B{p与q的关系}
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PA1"><span class="nav-number">1.</span> <span class="nav-text">PA1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PA1-0"><span class="nav-number">1.1.</span> <span class="nav-text">PA1.0</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PA1-1"><span class="nav-number">1.2.</span> <span class="nav-text">PA1.1</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#si%E5%91%BD%E4%BB%A4"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">si命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#x%E5%91%BD%E4%BB%A4"><span class="nav-number">1.2.0.2.</span> <span class="nav-text">x命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#info-r%E5%91%BD%E4%BB%A4"><span class="nav-number">1.2.0.3.</span> <span class="nav-text">info r命令</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PA1-2"><span class="nav-number">1.3.</span> <span class="nav-text">PA1.2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PA1-3"><span class="nav-number">1.4.</span> <span class="nav-text">PA1.3</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PA2"><span class="nav-number">2.</span> <span class="nav-text">PA2</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PA2-1"><span class="nav-number">2.1.</span> <span class="nav-text">PA2.1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#call%E6%8C%87%E4%BB%A4"><span class="nav-number">2.1.1.</span> <span class="nav-text">call指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ret%E6%8C%87%E4%BB%A4"><span class="nav-number">2.1.2.</span> <span class="nav-text">ret指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#push%E6%8C%87%E4%BB%A4"><span class="nav-number">2.1.3.</span> <span class="nav-text">push指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sub%E6%8C%87%E4%BB%A4"><span class="nav-number">2.1.4.</span> <span class="nav-text">sub指令</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PA1"><span class="nav-number">1.</span> <span class="nav-text">PA1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PA1-0"><span class="nav-number">1.1.</span> <span class="nav-text">PA1.0</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PA1-1"><span class="nav-number">1.2.</span> <span class="nav-text">PA1.1</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#si%E5%91%BD%E4%BB%A4"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">si命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#x%E5%91%BD%E4%BB%A4"><span class="nav-number">1.2.0.2.</span> <span class="nav-text">x命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#info-r%E5%91%BD%E4%BB%A4"><span class="nav-number">1.2.0.3.</span> <span class="nav-text">info r命令</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PA1-2"><span class="nav-number">1.3.</span> <span class="nav-text">PA1.2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PA1-3"><span class="nav-number">1.4.</span> <span class="nav-text">PA1.3</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PA2"><span class="nav-number">2.</span> <span class="nav-text">PA2</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PA2-1"><span class="nav-number">2.1.</span> <span class="nav-text">PA2.1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#call%E6%8C%87%E4%BB%A4"><span class="nav-number">2.1.1.</span> <span class="nav-text">call指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ret%E6%8C%87%E4%BB%A4"><span class="nav-number">2.1.2.</span> <span class="nav-text">ret指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#push%E6%8C%87%E4%BB%A4"><span class="nav-number">2.1.3.</span> <span class="nav-text">push指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xor%E6%8C%87%E4%BB%A4"><span class="nav-number">2.1.4.</span> <span class="nav-text">xor指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sub%E6%8C%87%E4%BB%A4"><span class="nav-number">2.1.5.</span> <span class="nav-text">sub指令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PA2-2"><span class="nav-number">2.2.</span> <span class="nav-text">PA2.2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sete%E6%8C%87%E4%BB%A4"><span class="nav-number">2.2.1.</span> <span class="nav-text">sete指令</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
