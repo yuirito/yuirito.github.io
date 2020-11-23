@@ -176,7 +176,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-11-20 16:38:51" itemprop="dateModified" datetime="2020-11-20T16:38:51+08:00">2020-11-20</time>
+                <time title="Modified: 2020-11-23 16:39:50" itemprop="dateModified" datetime="2020-11-23T16:39:50+08:00">2020-11-23</time>
               </span>
 
           
@@ -707,6 +707,11 @@ A(开始) --> B{p与q的关系}
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> invert = subcode &amp; <span class="number">0x1</span>;</span><br><span class="line">  <span class="keyword">enum</span> &#123;</span><br><span class="line">    CC_O, CC_NO, CC_B,  CC_NB,</span><br><span class="line">    CC_E, CC_NE, CC_BE, CC_NBE,</span><br><span class="line">    CC_S, CC_NS, CC_P,  CC_NP,</span><br><span class="line">    CC_L, CC_NL, CC_LE, CC_NLE</span><br><span class="line">  &#125;;</span><br></pre></td></tr></table></figure>
 
 <p>需要完成cc.c文件里面的rtl_setcc()。</p>
+<h3 id="sprintf"><a href="#sprintf" class="headerlink" title="sprintf"></a>sprintf</h3><p>按照手册提示，在这些测试文件中，string.c和hello-str.c需要实现常用的字符串库函数还有printf和sprintf，字符串库函数就不说了，大一的时候就经常做了。这里主要说下sprintf的实现。</p>
+<p>在开始之前我要先说一些我在抄代码的时候发现的问题，我做实验的时候参考了2个github的代码，我抄的时候也会相互借鉴，有些地方我觉得可以改善的也会自己修改，因此会有些不同，我相信如果有人抄我代码的时候也不会无脑全抄吧。但是就是这细微的差别我发现使得我和github上面的opcode_table不一样，我来从头到尾讲一下，首先是对于sprintf的实现，其中%d的实现，我觉得其中一个人的不太好，开了个定长数组再倒叙输出数字，于是我选择了使用指针在原字符串的基础上进行倒叙，就不受长度限制了。但是我本来抄他的代码hit good trap了，也就是通过了测试，但是在我修改完sprintf的实现后，突然就告诉我有未实现的汇编指令，然后我打开反汇编一看，确实有一条我没有实现的汇编指令，然后我去看GitHub的opcode_table，发现他也没有实现，我又把代码抄回去，试了下他的代码，然后还是hit good trap了，我马上对比了一下反汇编结果，发现他的反汇编与我的反汇编是不一样的，他没有这条指令，也就是说，根据你对于sprintf的实现，你的反汇编结果是不一样的，要实现的汇编指令也不一定相同，因此如果你抄我的代码，但是又想修改，那你也有可能要加新的汇编指令。</p>
+<p>接下来我们具体说下如何实现sprintf：</p>
+<p>首先有必要了解下变长参数的原理，对va_list和va_start,va_end,va_arg的用法了解，可以自行上网搜索原理和用法，我看到的这篇博客感觉还可以<a href="https://www.cnblogs.com/pengdonglin137/p/3345911.html">理解可变参数va_list、va_start、va_arg、va_end原理及使用方法</a></p>
+<p>刚好博客里面也有%d,%s的实现，我这里也就不用多说了，省点字:)</p>
 
       
     </div>
