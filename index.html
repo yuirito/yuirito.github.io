@@ -176,7 +176,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-12-10 10:28:31" itemprop="dateModified" datetime="2020-12-10T10:28:31+08:00">2020-12-10</time>
+                <time title="Modified: 2020-12-10 10:45:07" itemprop="dateModified" datetime="2020-12-10T10:45:07+08:00">2020-12-10</time>
               </span>
 
           
@@ -869,7 +869,33 @@ A(开始) --> B{p与q的关系}
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sys_yield</span><span class="params">()</span></span>&#123;</span><br><span class="line">  _yield();</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sys_exit</span><span class="params">(<span class="keyword">uintptr_t</span> arg)</span></span>&#123;</span><br><span class="line">  _halt(arg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>运行dummy进行测试，成功hit good trap说明实现完成</p>
-<h3 id="标准输出"><a href="#标准输出" class="headerlink" title="标准输出"></a>标准输出</h3>
+<h3 id="标准输出"><a href="#标准输出" class="headerlink" title="标准输出"></a>标准输出</h3><p>添加<code>sys_write</code>系统调用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">size_t</span> <span class="title">sys_write</span><span class="params">(<span class="keyword">int</span> fd,<span class="keyword">const</span> <span class="keyword">void</span> *buf,<span class="keyword">size_t</span> count)</span></span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(fd==<span class="number">1</span>||fd==<span class="number">2</span>)&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;count;i++)&#123;</span><br><span class="line">      _putc(((<span class="keyword">char</span> *)buf)[i]);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外不要忘记在<code>navy-apps/libs/libos/src/nanos.c</code>的<code>_write()</code>中调用系统调用接口函数，我就是没仔细看手册，漏了这句话，还去调试了半天，很难受</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> _write(<span class="keyword">int</span> fd, <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> count) &#123;</span><br><span class="line">  <span class="keyword">return</span> _syscall_(SYS_write,fd,buf,count);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="堆区管理"><a href="#堆区管理" class="headerlink" title="堆区管理"></a>堆区管理</h3><p>因为暂时不用实现具体的内存分配，所以按照手册说的只需要系统调用的时候返回0表示成功即可：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sys_brk</span><span class="params">(<span class="keyword">uintptr_t</span> increment)</span></span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接口方面，按照手册说明的流程做</p>
+<ol>
+<li><p>program break一开始的位置位于<code>_end</code></p>
+</li>
+<li><p>被调用时, 根据记录的program break位置和参数<code>increment</code>, 计算出新program break</p>
+</li>
+<li><p>通过<code>SYS_brk</code>系统调用来让操作系统设置新program break</p>
+</li>
+<li><p>若<code>SYS_brk</code>系统调用成功, 该系统调用会返回<code>0</code>, 此时更新之前记录的program break的位置, 并将旧program break的位置作为<code>_sbrk()</code>的返回值返回</p>
+</li>
+<li><p>若该系统调用失败, <code>_sbrk()</code>会返回-1</p>
+</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> *_sbrk(<span class="keyword">intptr_t</span> increment) &#123;</span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">void</span>* program_break = (<span class="keyword">uintptr_t</span>)&amp;_end;</span><br><span class="line">  <span class="keyword">void</span>* old = program_break;</span><br><span class="line">  <span class="keyword">if</span>(_syscall_(SYS_brk,(<span class="keyword">uintptr_t</span>)(program_break+increment),<span class="number">0</span>,<span class="number">0</span>)==<span class="number">0</span>)&#123;</span><br><span class="line">    program_break+=increment;</span><br><span class="line">    <span class="keyword">return</span>(<span class="keyword">void</span>*)old;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> (<span class="keyword">void</span> *)<span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
       
     </div>
 
