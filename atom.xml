@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2021-11-15T02:18:18.675Z</updated>
+  <updated>2021-11-15T02:23:17.356Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,19 +17,41 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>操作系统听课笔记</title>
+    <link href="http://example.com/2021/11/15/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%90%AC%E8%AF%BE%E7%AC%94%E8%AE%B0/"/>
+    <id>http://example.com/2021/11/15/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%90%AC%E8%AF%BE%E7%AC%94%E8%AE%B0/</id>
+    <published>2021-11-15T02:23:17.000Z</published>
+    <updated>2021-11-15T02:23:17.356Z</updated>
+    
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
     <title>论文笔记-A Unified Architecture for Accelerating Distributed DNN Training in Heterogeneous GPU or CPU Clusters</title>
     <link href="http://example.com/2021/11/15/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0-A-Unified-Architecture-for-Accelerating-Distributed-DNN-Training-in-Heterogeneous-GPU-or-CPU-Clusters/"/>
     <id>http://example.com/2021/11/15/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0-A-Unified-Architecture-for-Accelerating-Distributed-DNN-Training-in-Heterogeneous-GPU-or-CPU-Clusters/</id>
     <published>2021-11-15T02:16:50.000Z</published>
-    <updated>2021-11-15T02:18:18.675Z</updated>
+    <updated>2021-11-15T07:37:45.233Z</updated>
     
+    <content type="html"><![CDATA[<h1 id="问题与动机"><a href="#问题与动机" class="headerlink" title="问题与动机"></a>问题与动机</h1><p>数据中心在做DNN训练所用的集群是异构的，有的机器只有CPU，有的机器同时有CPU和GPU，然而现存的两种分布式DNN训练架构all-reduce和Parameter Server(PS)都不能充分利用异构资源。在all-reduce中只有GPU被使用，在PS中同时用了CPU和GPU，理论上来说PS的表现应该优于all-reduce，因为它利用了空闲的CPU资源，然而实际上，由于种种原因导致现在的PS表现更差。我们受此启发设计了BytePS。</p><p>all-reduce和PS都是在特定的GPU/CPU配置中理论上达到最优，而非通用设置，比如没有考虑有限的额外CPU资源。通过仔细分配流量负载，BytePS统一了PS或all-reduce在理论上是最优的情况，并将最优性推广到具有不同PCIe/NVLink配置的任何给定数量的GPU/CPU机器，并提供分析证明。</p><p>在高速网络中，CPU的速度对于DNN优化器还不够快，容易成为瓶颈。我们引入一个新的抽象概念Summation Service解决这一问题，将优化过程分为梯度聚合和参数更新，我们将梯度聚合过程放在CPU上，而将对计算要求更高的参数更新过程放在了GPU上。在实现过程中结合之前工作的流水线和优先调度算法，解决了multiple RDMA-related performance问题。</p><p>从introduction中可以看到主要针对目前分布式训练DNN存在的三个问题提出了解决方案：</p><table><thead><tr><th>问题</th><th>解决方法</th></tr></thead><tbody><tr><td>目前的分布式DNN训练架构all-reduce和PS都没有充分利用异构资源，存在空闲的资源没有得到充分的利用。</td><td>设计了BytePS架构</td></tr><tr><td></td><td>我们进一步优化了机器内部通信，我们解释了GPU机器中的多样性和复杂的拓扑结构，并给出了优化策略和原则</td></tr><tr><td>高速网络中，CPU速度不够快，成为了PS设计中的瓶颈问题。</td><td>提出Summation Service，将优化过程细分为梯度聚合和参数更新，分别放在CPU和GPU上</td></tr></tbody></table><h2 id="all-reduce"><a href="#all-reduce" class="headerlink" title="all-reduce"></a>all-reduce</h2><p>源于HPC社区，all-reduce中的GPU在更新自己参数之前都会收集每一个GPU的梯度。在所有all-reduce架构中都没有使用CPU。Ring是目前最流行的all-reduce算法。all-reduce在分布式DNN训练领域一直是保持最优成绩。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="/2021/11/15/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0-A-Unified-Architecture-for-Accelerating-Distributed-DNN-Training-in-Heterogeneous-GPU-or-CPU-Clusters/all-reduce.png" alt="" title="">                </div>                <div class="image-caption"></div>            </figure><p>all-reduce可以分为两个过程：reduce-scatter和all-gather。reduce-scatter将整个M bytes划分为n部分，由n个有着不同起点和终点的环(ring)来分别reduce这n部分。每一个节点将发送(n-1)M/n流量，因为每一个节点都作为一个环的终点所以不用发送，但是在另外的n-1个环中，它必须发送M/n bytes。</p><p>all-gather需要每个节点使用一个环向另外n-1个节点广播自己reduce部分，最终所有节点都会有相同数据，与reduce-scatter相似，在这一过程中，每个节点也要发送(n-1)M/n流量。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;问题与动机&quot;&gt;&lt;a href=&quot;#问题与动机&quot; class=&quot;headerlink&quot; title=&quot;问题与动机&quot;&gt;&lt;/a&gt;问题与动机&lt;/h1&gt;&lt;p&gt;数据中心在做DNN训练所用的集群是异构的，有的机器只有CPU，有的机器同时有CPU和GPU，然而现存的两种分布式DN</summary>
+      
     
     
     
     <category term="论文笔记" scheme="http://example.com/categories/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/"/>
     
     
-    <category term="操作系统 分布式" scheme="http://example.com/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+    <category term="操作系统" scheme="http://example.com/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
+    
+    <category term="分布式" scheme="http://example.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
     
   </entry>
   
