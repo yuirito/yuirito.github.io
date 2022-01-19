@@ -158,6 +158,86 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/12/24/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Domain-Generalization-using-Causal-Matching/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="yuirito">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yuirito's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/24/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Domain-Generalization-using-Causal-Matching/" class="post-title-link" itemprop="url">论文阅读笔记-Domain Generalization using Causal Matching</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-24 14:39:38" itemprop="dateCreated datePublished" datetime="2021-12-24T14:39:38+08:00">2021-12-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-29 09:16:10" itemprop="dateModified" datetime="2021-12-29T09:16:10+08:00">2021-12-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">-论文阅读笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="1-动机"><a href="#1-动机" class="headerlink" title="1 动机"></a>1 动机</h1><p><strong>领域泛化是指在对多个数据分布进行训练后，学习到一个泛化模型，该模型可以应用到不可见数据上的分布。</strong>例如在一个区域的医院上训练的模型可以应用到另一个区域，图像分类器可以应用到稍微旋转的图像上等。传统的目标是学习到<strong>不同领域</strong>上的<strong>稳定特征</strong>(“stable” features)，流行的方法是学习独立于领域的表示，称为<em>类别条件</em>(<em>conditional on class</em>)。但是这篇文章的作者指出这样是不够的，<strong>当待学习的稳定特征在不同领域的分布不同时，类别条件目标不足以学习稳定特征（只有当稳定特征在不同领域的分布相同时，它们才是最优的）。</strong>为此，作者在之前的单域工作上使用因果结果模型进行推广表示稳定特征的类内变化。<strong>该模型假设每个输入都是由稳定(因果)和领域相关(非因果) 混合构成的，其中只有稳定的特征会影响输出，作者认为域是一种特殊的干预，它改变了输入的非因果特征，并假定理想的分类器应该只基于因果特征。</strong></p>
+<p>作者指出正确的目标是<strong>建立一个对每个对象具有不变条件的表示</strong>，这里对象被定义为共享相同因果的一组输入，例如照片中不同视角下的同一个人。除了对象已知外，作者针对对象未知的情况下，基于同一类别的输入比不同类别的输入具有更相似的因果特征的假设，提出了MatchDG算法，进一步在增强数据集上扩展为MDGHybrid。</p>
+<p>主要贡献：</p>
+<ul>
+<li>提出域泛化的对象不变条件</li>
+<li>针对对象信息未知的情况下，提出一种两阶段迭代算法，用于近似基于对象的匹配。 </li>
+</ul>
+<h1 id="2-方法"><a href="#2-方法" class="headerlink" title="2 方法"></a>2 方法</h1>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/11/03/%E5%8A%A8%E6%80%81%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E8%A1%A5%E5%85%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -189,7 +269,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-05 12:23:36" itemprop="dateModified" datetime="2021-11-05T12:23:36+08:00">2021-11-05</time>
+                <time title="修改时间：2022-01-19 09:46:08" itemprop="dateModified" datetime="2022-01-19T09:46:08+08:00">2022-01-19</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1171,20 +1251,20 @@ A(开始) --&gt; B{p与q的关系}
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">3</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1222,7 +1302,7 @@ A(开始) --&gt; B{p与q的关系}
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -1322,6 +1402,61 @@ if (document.querySelectorAll('pre.mermaid').length) {
   
 
   
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
 
   
 
