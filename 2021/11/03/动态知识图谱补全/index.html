@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="由于今天本来准备上课讲的，结果因为时间原因没讲成，很难受，和lyyy聊了以后，决定重新开始写博客做一些成长记录，刚好今天这个报告就可以作为一个新的开始。 动态知识图谱补全虽然标题叫做动态知识图谱补全，但是我今天的报告本来只打算做最近看的4篇论文，不过不知道未来会不会继续看，到时候可以继续加进这个博客里面。 动态知识图谱的概念和定义动态知识图谱是相对静态知识图谱而言的，传统的基于三元组$(s,r,o">
+  <meta name="description" content="由于今天本来准备上课讲的，结果因为时间原因没讲成，很难受，和lyyy聊了以后，决定重新开始写博客做一些成长记录，刚好今天这个报告就可以作为一个新的开始。 动态知识图谱补全 虽然标题叫做动态知识图谱补全，但是我今天的报告本来只打算做最近看的4篇论文，不过不知道未来会不会继续看，到时候可以继续加进这个博客里面。 动态知识图谱的概念和定义 动态知识图谱是相对静态知识图谱而言的，传统的基于三元组\((s,">
 <meta property="og:type" content="article">
 <meta property="og:title" content="动态知识图谱补全">
 <meta property="og:url" content="http://example.com/2021/11/03/%E5%8A%A8%E6%80%81%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E8%A1%A5%E5%85%A8/index.html">
 <meta property="og:site_name" content="yuirito&#39;s blog">
-<meta property="og:description" content="由于今天本来准备上课讲的，结果因为时间原因没讲成，很难受，和lyyy聊了以后，决定重新开始写博客做一些成长记录，刚好今天这个报告就可以作为一个新的开始。 动态知识图谱补全虽然标题叫做动态知识图谱补全，但是我今天的报告本来只打算做最近看的4篇论文，不过不知道未来会不会继续看，到时候可以继续加进这个博客里面。 动态知识图谱的概念和定义动态知识图谱是相对静态知识图谱而言的，传统的基于三元组$(s,r,o">
+<meta property="og:description" content="由于今天本来准备上课讲的，结果因为时间原因没讲成，很难受，和lyyy聊了以后，决定重新开始写博客做一些成长记录，刚好今天这个报告就可以作为一个新的开始。 动态知识图谱补全 虽然标题叫做动态知识图谱补全，但是我今天的报告本来只打算做最近看的4篇论文，不过不知道未来会不会继续看，到时候可以继续加进这个博客里面。 动态知识图谱的概念和定义 动态知识图谱是相对静态知识图谱而言的，传统的基于三元组\((s,">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-11-03T08:33:32.000Z">
 <meta property="article:modified_time" content="2022-01-19T01:46:08.113Z">
@@ -217,11 +217,14 @@
 
       
         <p>由于今天本来准备上课讲的，结果因为时间原因没讲成，很难受，和lyyy聊了以后，决定重新开始写博客做一些成长记录，刚好今天这个报告就可以作为一个新的开始。</p>
-<h1 id="动态知识图谱补全"><a href="#动态知识图谱补全" class="headerlink" title="动态知识图谱补全"></a>动态知识图谱补全</h1><p>虽然标题叫做动态知识图谱补全，但是我今天的报告本来只打算做最近看的4篇论文，不过不知道未来会不会继续看，到时候可以继续加进这个博客里面。</p>
-<h2 id="动态知识图谱的概念和定义"><a href="#动态知识图谱的概念和定义" class="headerlink" title="动态知识图谱的概念和定义"></a>动态知识图谱的概念和定义</h2><p>动态知识图谱是相对静态知识图谱而言的，传统的基于三元组$(s,r,o)$的知识图谱被称为静态知识图谱，但是由于事实会随着时间发生改变，所以引入了时间维度描述该事实成立的一个时间范围，有的动态知识图谱会给每个事实增加一个开始和结束时间戳，这样变成了五元组，但是我看到的大多数动态知识推理方法还是基于增加一个时间戳t形成四元组$(s,r,o,t)$。通常情况下这个时间戳t代表了一段时间，比如RE-NET论文中ICEWS14数据集，每个样本的t持续范围是24小时。然后还有一个值得一提的地方就是动态知识图谱(Dynamic Knowledge Graph)也可以称为时序知识图谱(Temporal Knowledge Graph, TKG)。这里从DEEMB的论文中给出一个TKG的形式化定义：</p>
-<p>$\textbf{时序知识图谱（补全）：}$用$\mathcal{V}$表示实体的一个有限集合，$\mathcal{R}$表示关系类型的一个有限集合，并且用$\mathcal{T}$表示时间戳的一个有限集合。$\mathcal{W} \subset \mathcal{V} \times \mathcal{R} \times \mathcal{V} \times \mathcal{T} $ 表示事实四元组$(s,r,o,t)$的一个有限集合，其中$s,o \in \mathcal{V}, r \in \mathcal{R}, t \in \mathcal{T} $。 一个时序知识图谱$\mathcal{G}$是 $\mathcal{W}$的子集，即$\mathcal{G} \subset \mathcal{W} $。时序知识图谱补全问题可以描述为从$\mathcal{G}$中推理$\mathcal{W}$。</p>
+<h1 id="动态知识图谱补全">动态知识图谱补全</h1>
+<p>虽然标题叫做动态知识图谱补全，但是我今天的报告本来只打算做最近看的4篇论文，不过不知道未来会不会继续看，到时候可以继续加进这个博客里面。</p>
+<h2 id="动态知识图谱的概念和定义">动态知识图谱的概念和定义</h2>
+<p>动态知识图谱是相对静态知识图谱而言的，传统的基于三元组<span class="math inline">\((s,r,o)\)</span>的知识图谱被称为静态知识图谱，但是由于事实会随着时间发生改变，所以引入了时间维度描述该事实成立的一个时间范围，有的动态知识图谱会给每个事实增加一个开始和结束时间戳，这样变成了五元组，但是我看到的大多数动态知识推理方法还是基于增加一个时间戳t形成四元组<span class="math inline">\((s,r,o,t)\)</span>。通常情况下这个时间戳t代表了一段时间，比如RE-NET论文中ICEWS14数据集，每个样本的t持续范围是24小时。然后还有一个值得一提的地方就是动态知识图谱(Dynamic Knowledge Graph)也可以称为时序知识图谱(Temporal Knowledge Graph, TKG)。这里从DEEMB的论文中给出一个TKG的形式化定义：</p>
+<p><span class="math inline">\(\textbf{时序知识图谱（补全）：}\)</span>用<span class="math inline">\(\mathcal{V}\)</span>表示实体的一个有限集合，<span class="math inline">\(\mathcal{R}\)</span>表示关系类型的一个有限集合，并且用<span class="math inline">\(\mathcal{T}\)</span>表示时间戳的一个有限集合。$     $ 表示事实四元组<span class="math inline">\((s,r,o,t)\)</span>的一个有限集合，其中$s,o , r , t  <span class="math inline">\(。 一个时序知识图谱\)</span>$是 <span class="math inline">\(\mathcal{W}\)</span>的子集，即$  <span class="math inline">\(。时序知识图谱补全问题可以描述为从\)</span><span class="math inline">\(中推理\)</span>$。</p>
 <p>其实简单来说还是从已有的事实推理潜在的事实，只不过现在加上了时间维度罢了。</p>
-<h2 id="TAE-ILP模型"><a href="#TAE-ILP模型" class="headerlink" title="TAE-ILP模型"></a>TAE-ILP模型</h2>
+<h2 id="tae-ilp模型">TAE-ILP模型</h2>
+
     </div>
 
     
@@ -301,7 +304,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#动态知识图谱补全"><span class="nav-number">1.</span> <span class="nav-text">动态知识图谱补全</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#动态知识图谱的概念和定义"><span class="nav-number">1.1.</span> <span class="nav-text">动态知识图谱的概念和定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TAE-ILP模型"><span class="nav-number">1.2.</span> <span class="nav-text">TAE-ILP模型</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#动态知识图谱补全"><span class="nav-number">1.</span> <span class="nav-text">动态知识图谱补全</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#动态知识图谱的概念和定义"><span class="nav-number">1.1.</span> <span class="nav-text">动态知识图谱的概念和定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tae-ilp模型"><span class="nav-number">1.2.</span> <span class="nav-text">TAE-ILP模型</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

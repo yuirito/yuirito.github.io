@@ -20,17 +20,17 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="1 动机领域泛化是指在对多个数据分布进行训练后，学习到一个泛化模型，该模型可以应用到不可见数据上的分布。例如在一个区域的医院上训练的模型可以应用到另一个区域，图像分类器可以应用到稍微旋转的图像上等。传统的目标是学习到不同领域上的稳定特征(“stable” features)，流行的方法是学习独立于领域的表示，称为类别条件(conditional on class)。但是这篇文章的作者指出这样是不够">
+  <meta name="description" content="1 动机 领域泛化是指在对多个数据分布进行训练后，学习到一个泛化模型，该模型可以应用到不可见数据上的分布。例如在一个区域的医院上训练的模型可以应用到另一个区域，图像分类器可以应用到稍微旋转的图像上等。传统的目标是学习到不同领域上的稳定特征(&quot;stable&quot; features)，流行的方法是学习独立于领域的表示，称为类别条件(conditional on class)。但是这篇文章的作者指出这样是不">
 <meta property="og:type" content="article">
 <meta property="og:title" content="论文阅读笔记-Domain Generalization using Causal Matching">
 <meta property="og:url" content="http://example.com/2021/12/24/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Domain-Generalization-using-Causal-Matching/index.html">
 <meta property="og:site_name" content="yuirito&#39;s blog">
-<meta property="og:description" content="1 动机领域泛化是指在对多个数据分布进行训练后，学习到一个泛化模型，该模型可以应用到不可见数据上的分布。例如在一个区域的医院上训练的模型可以应用到另一个区域，图像分类器可以应用到稍微旋转的图像上等。传统的目标是学习到不同领域上的稳定特征(“stable” features)，流行的方法是学习独立于领域的表示，称为类别条件(conditional on class)。但是这篇文章的作者指出这样是不够">
+<meta property="og:description" content="1 动机 领域泛化是指在对多个数据分布进行训练后，学习到一个泛化模型，该模型可以应用到不可见数据上的分布。例如在一个区域的医院上训练的模型可以应用到另一个区域，图像分类器可以应用到稍微旋转的图像上等。传统的目标是学习到不同领域上的稳定特征(&quot;stable&quot; features)，流行的方法是学习独立于领域的表示，称为类别条件(conditional on class)。但是这篇文章的作者指出这样是不">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2021/12/24/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Domain-Generalization-using-Causal-Matching/1.png">
 <meta property="og:image" content="http://example.com/2021/12/24/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Domain-Generalization-using-Causal-Matching/2.png">
 <meta property="article:published_time" content="2021-12-24T06:39:38.000Z">
-<meta property="article:modified_time" content="2022-01-20T09:08:27.186Z">
+<meta property="article:modified_time" content="2022-01-20T09:15:58.486Z">
 <meta property="article:author" content="yuirito">
 <meta property="article:tag" content="-阅读笔记 -因果 -领域泛化">
 <meta name="twitter:card" content="summary">
@@ -197,7 +197,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-01-20 17:08:27" itemprop="dateModified" datetime="2022-01-20T17:08:27+08:00">2022-01-20</time>
+                <time title="修改时间：2022-01-20 17:15:58" itemprop="dateModified" datetime="2022-01-20T17:15:58+08:00">2022-01-20</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -220,41 +220,46 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="1-动机"><a href="#1-动机" class="headerlink" title="1 动机"></a>1 动机</h1><p><strong>领域泛化是指在对多个数据分布进行训练后，学习到一个泛化模型，该模型可以应用到不可见数据上的分布。</strong>例如在一个区域的医院上训练的模型可以应用到另一个区域，图像分类器可以应用到稍微旋转的图像上等。传统的目标是学习到<strong>不同领域</strong>上的<strong>稳定特征</strong>(“stable” features)，流行的方法是学习独立于领域的表示，称为<em>类别条件</em>(<em>conditional on class</em>)。但是这篇文章的作者指出这样是不够的，<strong>当待学习的稳定特征在不同领域的分布不同时，类别条件目标不足以学习稳定特征（只有当稳定特征在不同领域的分布相同时，它们才是最优的）。</strong>为此，作者在之前的单域工作上使用因果结果模型进行推广表示稳定特征的类内变化。<strong>该模型假设每个输入都是由稳定(因果)和领域相关(非因果) 混合构成的，其中只有稳定的特征会影响输出，作者认为域是一种特殊的干预，它改变了输入的非因果特征，并假定理想的分类器应该只基于因果特征。</strong></p>
+        <h1 id="动机">1 动机</h1>
+<p><strong>领域泛化是指在对多个数据分布进行训练后，学习到一个泛化模型，该模型可以应用到不可见数据上的分布。</strong>例如在一个区域的医院上训练的模型可以应用到另一个区域，图像分类器可以应用到稍微旋转的图像上等。传统的目标是学习到<strong>不同领域</strong>上的<strong>稳定特征</strong>("stable" features)，流行的方法是学习独立于领域的表示，称为<em>类别条件</em>(<em>conditional on class</em>)。但是这篇文章的作者指出这样是不够的，<strong>当待学习的稳定特征在不同领域的分布不同时，类别条件目标不足以学习稳定特征（只有当稳定特征在不同领域的分布相同时，它们才是最优的）。</strong>为此，作者在之前的单域工作上使用因果结果模型进行推广表示稳定特征的类内变化。<strong>该模型假设每个输入都是由稳定(因果)和领域相关(非因果) 混合构成的，其中只有稳定的特征会影响输出，作者认为域是一种特殊的干预，它改变了输入的非因果特征，并假定理想的分类器应该只基于因果特征。</strong></p>
 <p>作者指出正确的目标是<strong>建立一个对每个对象具有不变条件的表示</strong>，这里对象被定义为共享相同因果的一组输入，例如照片中不同视角下的同一个人。除了对象已知外，作者针对对象未知的情况下，基于同一类别的输入比不同类别的输入具有更相似的因果特征的假设，提出了MatchDG算法，进一步在增强数据集上扩展为MDGHybrid。</p>
 <p>主要贡献：</p>
 <ul>
 <li>提出域泛化的对象不变条件</li>
-<li>针对对象信息未知的情况下，提出一种两阶段迭代算法，用于近似基于对象的匹配。 </li>
+<li>针对对象信息未知的情况下，提出一种两阶段迭代算法，用于近似基于对象的匹配。</li>
 </ul>
-<h1 id="2-方法"><a href="#2-方法" class="headerlink" title="2 方法"></a>2 方法</h1><p>想办法找到与领域无关的不变特征$X_c$，</p>
-<script type="math/tex; mode=display">
-o :=y_o(y_{true},\epsilon _o,\epsilon _{od}) \; \; \;x_c=g_{xc}(o)</script><script type="math/tex; mode=display">
-x_a := g_{xa}(d,o,\epsilon _{xa}) \; \; \; x:=g_x(x_c,x_a,\epsilon _x) \;\;\; y:=h(x_c,\epsilon _y)</script><p><img src="/2021/12/24/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Domain-Generalization-using-Causal-Matching/1.png" alt=""></p>
-<p>假设$ X_C$已知，理想的损失函数：</p>
-<script type="math/tex; mode=display">
-arg\;\mathop{min}_f \; \mathbb{E}_{d,x,y}l(y,f(x))=arg \; \mathop{min}_h \; \mathbb{E}[l(y,h(x_c))]      \tag{1}</script><p>然而实际上$ X_C$未知，因此要先学习表示函数$\Phi : \mathcal{X} \to \mathcal{C} $</p>
-<p>$X_c$满足两个条件</p>
+<h1 id="方法">2 方法</h1>
+<p>想办法找到与领域无关的不变特征<span class="math inline">\(X_c\)</span>， <span class="math display">\[
+o :=y_o(y_{true},\epsilon _o,\epsilon _{od}) \; \; \;x_c=g_{xc}(o)
+\]</span></p>
+<p><span class="math display">\[
+x_a := g_{xa}(d,o,\epsilon _{xa}) \; \; \; x:=g_x(x_c,x_a,\epsilon _x) \;\;\; y:=h(x_c,\epsilon _y)
+\]</span></p>
+<p><img src="/2021/12/24/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Domain-Generalization-using-Causal-Matching/1.png"></p>
+<p>假设$ X_C$已知，理想的损失函数： <span class="math display">\[
+arg\;\mathop{min}_f \; \mathbb{E}_{d,x,y}l(y,f(x))=arg \; \mathop{min}_h \; \mathbb{E}[l(y,h(x_c))]      \tag{1}
+\]</span> 然而实际上$ X_C<span class="math inline">\(未知，因此要先学习表示函数\)</span>:   $</p>
+<p><span class="math inline">\(X_c\)</span>满足两个条件</p>
 <ul>
-<li>$X_C$条件独立于D|O，即 $X_c \perp !!! \perp D|O$</li>
-<li>$X_C  \not ! \perp !!! \perp O$</li>
+<li><span class="math inline">\(X_C\)</span>条件独立于D|O，即 <span class="math inline">\(X_c \perp \! \! \! \perp D|O\)</span></li>
+<li><span class="math inline">\(X_C \not \! \perp \!\!\! \perp O\)</span></li>
 </ul>
-<p>为满足第一个条件，规定同一对象O的跨域输入之间的平均成对距离为0：</p>
-<script type="math/tex; mode=display">
-\sum_{\Omega(j,k)=1;d \not= d'}dist(\Phi(x_{j}^{d}),\Phi(x_{k}^{d'}))=0</script><p>$\Omega: \mathcal{X} \times \mathcal{X} \to \{0,1\}$是匹配函数，输入对为同一个物体为1，否则为0.</p>
-<p>第二个条件说明$X_C$包含O的信息，因此也包括Y的</p>
-<script type="math/tex; mode=display">
+<p>为满足第一个条件，规定同一对象O的跨域输入之间的平均成对距离为0： <span class="math display">\[
+\sum_{\Omega(j,k)=1;d \not= d'}dist(\Phi(x_{j}^{d}),\Phi(x_{k}^{d'}))=0
+\]</span> <span class="math inline">\(\Omega: \mathcal{X} \times \mathcal{X} \to \{0,1\}\)</span>是匹配函数，输入对为同一个物体为1，否则为0.</p>
+<p>第二个条件说明<span class="math inline">\(X_C\)</span>包含O的信息，因此也包括Y的 <span class="math display">\[
 f_{perfectmatch}= arg\; min_{h,\Phi}\sum_{d=1}^mL_d(h(\Phi(X)),Y) 
-\\s.t. \;\sum_{\Omega(j,k)=1;d \not= d'}dist(\Phi(x_{j}^{d}),\Phi(x_{k}^{d'}))=0 \tag{2}</script><p>$L_d(h(\Phi(X)),Y) = \sum_{i=1}^{n_d}l(h(\Phi(x_i^{d}))\cdot y_i^d)$</p>
-<p>如果对象信息可用，那么损失函数如下</p>
-<script type="math/tex; mode=display">
+\\s.t. \;\sum_{\Omega(j,k)=1;d \not= d'}dist(\Phi(x_{j}^{d}),\Phi(x_{k}^{d'}))=0 \tag{2}
+\]</span> <span class="math inline">\(L_d(h(\Phi(X)),Y) = \sum_{i=1}^{n_d}l(h(\Phi(x_i^{d}))\cdot y_i^d)\)</span></p>
+<p>如果对象信息可用，那么损失函数如下 <span class="math display">\[
 f_{perfectmatch}= arg\; min_{h,\Phi}\sum_{d=1}^mL_d(h(\Phi(X)),Y) 
-+\lambda \sum_{\Omega(j,k)=1;d \not= d'}dist(\Phi(x_{j}^{d}),\Phi(x_{k}^{d'}))=0 \tag{3}</script><p>但对象信息并不总是可用的，因此作者提出两阶段迭代对比学习方法来近似对象匹配。</p>
-<p>为了找到匹配项，作者优化了对比表征学习损失，与来自不同领域的不同类别的输入相比，该损失最小化了来自不同领域的相同类别输入之间的距离。正匹配是具有相同类但不同域的两个输入，并且负匹配是不同类别的对。对每个正匹配对$(x_j,x_k)$:</p>
-<script type="math/tex; mode=display">
-l(x_j,x_k) = -log \frac{e^{sim(j,k)/\tau}}{e^{sim(j,k)/\tau}+\sum_{i=0,y_i\not=y_j}^Be^{sim(j,i)/\tau}} \tag{4}</script><p>B是batch size，$\tau$是超参数，$sim(a,b) = \frac{\Phi(x_a)^T\Phi(x_b)}{|\Phi(x_a)||\Phi(x_b)|}$是余弦相似度。</p>
++\lambda \sum_{\Omega(j,k)=1;d \not= d'}dist(\Phi(x_{j}^{d}),\Phi(x_{k}^{d'}))=0 \tag{3}
+\]</span> 但对象信息并不总是可用的，因此作者提出两阶段迭代对比学习方法来近似对象匹配。</p>
+<p>为了找到匹配项，作者优化了对比表征学习损失，与来自不同领域的不同类别的输入相比，该损失最小化了来自不同领域的相同类别输入之间的距离。正匹配是具有相同类但不同域的两个输入，并且负匹配是不同类别的对。对每个正匹配对<span class="math inline">\((x_j,x_k)\)</span>: <span class="math display">\[
+l(x_j,x_k) = -log \frac{e^{sim(j,k)/\tau}}{e^{sim(j,k)/\tau}+\sum_{i=0,y_i\not=y_j}^Be^{sim(j,i)/\tau}} \tag{4}
+\]</span> B是batch size，<span class="math inline">\(\tau\)</span>是超参数，<span class="math inline">\(sim(a,b) = \frac{\Phi(x_a)^T\Phi(x_b)}{\|\Phi(x_a)\|\|\Phi(x_b)\|}\)</span>是余弦相似度。</p>
 <p>MatchDG算法如下：</p>
-<p><img src="/2021/12/24/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Domain-Generalization-using-Causal-Matching/2.png" alt=""></p>
+<p><img src="/2021/12/24/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Domain-Generalization-using-Causal-Matching/2.png"></p>
 
     </div>
 
@@ -335,7 +340,7 @@ l(x_j,x_k) = -log \frac{e^{sim(j,k)/\tau}}{e^{sim(j,k)/\tau}+\sum_{i=0,y_i\not=y
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-动机"><span class="nav-number">1.</span> <span class="nav-text">1 动机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-方法"><span class="nav-number">2.</span> <span class="nav-text">2 方法</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#动机"><span class="nav-number">1.</span> <span class="nav-text">1 动机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方法"><span class="nav-number">2.</span> <span class="nav-text">2 方法</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
