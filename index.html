@@ -158,6 +158,211 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/02/21/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Neural-Unsupervised-Domain-Adaptation-in-NLP-A-Survey/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="yuirito">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yuirito's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/21/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Neural-Unsupervised-Domain-Adaptation-in-NLP-A-Survey/" class="post-title-link" itemprop="url">论文阅读笔记 - Neural Unsupervised Domain Adaptation in NLP - A Survey</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-21 20:48:14" itemprop="dateCreated datePublished" datetime="2022-02-21T20:48:14+08:00">2022-02-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-02-23 11:11:16" itemprop="dateModified" datetime="2022-02-23T11:11:16+08:00">2022-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">论文阅读笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="introduction">Introduction</h2>
+<p>大型预训练语言模型提升了很多NLP应用的性能，然而NLP模型在新条件下缺乏可移植性仍然是一个核心问题。对于很多模型，都假设训练域和目标域是从同一个分布下的抽样。但是对于很多目标域来说，经常难以获得带标记的数据。当目标域和源域的数据分布不一致的时候，就面临dataset shift问题，在NLP领域通常指domain shift。这一问题限制了模型的泛化能力。因此，一种特殊类型的迁移学习受到了人们关注——领域适应(Domain Adaptation, DA).</p>
+<p>DA与机器学习中一个更加基本，也更大的开放问题密切相关：超越训练分布的泛化。最终，智能系统应该能够适应并稳健地处理任何测试分布，而不必看到任何数据。</p>
+<p>DA的工作主要集中在有监督的领域适应上 ，在这样一个经典的有监督的DA设置中，可以使用少量标记的目标域数据，以及一些较大数量的标记的源域数据。 任务是根据有限的目标域数据，从源域调整到特定的目标域。然而，注释是一项耗费大量时间和成本的手动工作，虽然注释直接缓解了标记数据的缺乏，但它不容易扩展到新的应用程序目标。相比之下，DA方法的目标是将模型的能力从传统的相似示例插值转变为外推到原始训练分布之外的示例的模型。</p>
+<p>无监督领域自适应(Unsupervised domain adaptation, UDA)通过仅从未标记的目标数据学习来缓解域转移问题，该数据通常可用于源域和目标域。UDA更适合经典的真实场景，在这种场景中，目标域中没有标记的数据，但未标记的数据可能非常丰富。</p>
+<h3 id="da分类">DA分类</h3>
+<ul>
+<li>Modal-centric: 旨在增加特征空间，改变损失函数，架构或模型参数。</li>
+<li>数据方面，使用伪标记（或引导）来弥补领域差距，或者数据选择，pre-training。</li>
+<li>hybrid: 兼有上述两者</li>
+</ul>
+<p><img src="/2022/02/21/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Neural-Unsupervised-Domain-Adaptation-in-NLP-A-Survey/1.png"></p>
+<h2 id="background">Background</h2>
+<p>有监督学习符合i.i.d.假设(independently identically sampled from the same underlying distribution)</p>
+<h3 id="da符号">DA符号</h3>
+<p>domain: <span class="math inline">\(\mathcal{D} = \{\mathcal{X},P(X)\}\)</span></p>
+<p><span class="math inline">\(\mathcal{X}\)</span>: feature space</p>
+<p>P(X): marginal probability distribution</p>
+<p>task: <span class="math inline">\(\mathcal{T}=\{\mathcal{Y},P(Y|X)\}\)</span></p>
+<p>DA的目标在于学习函数f，从源域<span class="math inline">\(\mathcal{D}_S\)</span>泛化到目标域<span class="math inline">\(\mathcal{D}_T\)</span>,其中<span class="math inline">\(P_S(X) \ne P_T(X)\)</span></p>
+<p>DA是一种特殊的迁移学习，叫做transductive transfer learning，它与inductive learning的区别在于后者的任务不同，而transductive transfer learning的任务是相同的，仅仅是源域和目的域分布不同</p>
+<h2 id="domain">Domain</h2>
+<p>Plank提出了Variety space的概念，corpus被视为variety space的一个样本，是一个子空间。每个corpus不可避免的存在一定的偏向。</p>
+<p>cross-lingual learning: 字母表、词汇表和词序不同，特征空间发生了巨大的变化。</p>
+<p>domain generalization: 并非适应到特定某一个领域，而是旨在构建在多个已知目标域上具有鲁棒性的单一系统 。</p>
+<p>out-of-domain generalization: 域是先验未知的，泛化到未知目标</p>
+<h2 id="model-centric-approaches">Model-centric approaches</h2>
+<h3 id="feature-centric-methods">Feature-centric methods</h3>
+<p>Pivots-based DA: structural correspondence learning(SCL)找到跨域的通用特征</p>
+<p>Autoencoder-based DA: stacked denoising autoencoder(SDA)</p>
+<h3 id="loss-centric-methods">Loss-centric methods</h3>
+<p>Domain adversaries: 领域对抗性训练旨在学习潜在的特征表示，以减少源分布和目标分布之间的差异。进一步，可以通过无法识别输入示例来源（域）的特征表示来实现跨域泛化 。domain-adversarial neural networks(DANN)为了学习域不变特征表示，DANNs通过梯度反转层使用损失函数，确保源域和目标域中的特征分布相似。</p>
+<p>Reweighting:实例权重（也称为重要性权重）的核心思想是为每个训练实例分配一个权重，该权重与其与目标域的相似性成比例</p>
+<h2 id="data-centric-methods">Data-centric methods</h2>
+<h3 id="pseudo-labeling">Pseudo-labeling</h3>
+<p>伪标签的主要思想是应用经过训练的分类器预测未标记实例上的标签，然后将其视为‘pseudo’ gold labels</p>
+<h3 id="data-selection">Data selection</h3>
+<p>数据选择旨在为一个新领域选择最佳匹配数据，通常是通过使用perplexity或使用领域相似性度量</p>
+<h3 id="pre-training">pre-training</h3>
+<p>pre-training:关键思想是训练具有自我监督目标的编码器，如（masked）语言模型和相关的无监督目标</p>
+<p>adaptive pre-training: multi-phase pre-training and auxiliary-task pre-training</p>
+<p>multi-phase pre-training:使用第二阶段无监督的预训练</p>
+<p>auxiliary-task pre-training:通过多任务学习（MTL）或中间任务转移来使用标记的辅助任务</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/02/11/%E7%BB%98%E7%94%BB%E7%AC%94%E8%AE%B0-%E8%A4%B6%E7%9A%B1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="yuirito">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yuirito's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/11/%E7%BB%98%E7%94%BB%E7%AC%94%E8%AE%B0-%E8%A4%B6%E7%9A%B1/" class="post-title-link" itemprop="url">绘画笔记-褶皱</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-11 21:51:06" itemprop="dateCreated datePublished" datetime="2022-02-11T21:51:06+08:00">2022-02-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-02-16 22:43:05" itemprop="dateModified" datetime="2022-02-16T22:43:05+08:00">2022-02-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BB%98%E7%94%BB%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">绘画笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>褶皱，最常见的就是，衣服被挤压，弯曲的地方密集，对应另一边被拉伸就少或者没有，直线的手臂一条直线下来也比较僵硬，考虑衣服自身的蓬松和重力挤压</p>
+<p>褶皱分为7种类型：</p>
+<h2 id="pipe-fold">pipe fold</h2>
+<p>仅有一个源点，由拉力产生的管状褶皱</p>
+<h2 id="diaper-fold">diaper fold</h2>
+<p>有两个源点支撑产生的褶皱</p>
+<h2 id="half-lock-fold">half-lock fold</h2>
+<p>在管状弯曲的部位，方向改变的位置，一部分重叠在另外一部分上面。</p>
+<h2 id="spiral-fold">spiral fold</h2>
+<p>螺旋缠绕包裹形成的褶皱</p>
+<h2 id="zig-zag-fold">zig-zag fold</h2>
+<p>由布料压缩时候产生的褶皱，特别是有多余布料进行堆积时候产生</p>
+<h2 id="flag-fold">flag fold</h2>
+<p>通常由风力吹动产生的动态褶皱，由潜在的流动性的力引导产生，给人以动感。</p>
+<h2 id="inert-or-dead-fold">inert or dead fold</h2>
+<p>无潜在或明确的形态，由大量不规则形状互相堆积形成，可以在其中找到形似half-lock,spirals,zig-zags，但与其下面的结构并无关系。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/12/24/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-Domain-Generalization-using-Causal-Matching/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1162,20 +1367,20 @@ A(开始) --&gt; B{p与q的关系}
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
